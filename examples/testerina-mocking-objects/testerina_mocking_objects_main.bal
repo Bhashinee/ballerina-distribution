@@ -4,8 +4,8 @@ import ballerina/io;
 import ballerina/email;
 
 // Clients objects are defined globally to be able to replace in test files.
-http:Client clientEndpoint = new("http://postman-echo.com");
-email:SmtpClient smtpClient = new("localhost", "admin", "admin");
+http:Client clientEndpoint = check new("http://postman-echo.com");
+email:SmtpClient smtpClient = check new("localhost", "admin", "admin");
 
 // This function performs two `GET` requests to the specified
 // endpoint and returns the response.
@@ -26,16 +26,16 @@ function performGet() returns @tainted http:Response {
     return response;
 }
 
-// This function sends out email to specified email addresses
+// This function sends out an email to the specified email addresses
 // and returns an error if found.
 function sendNotification(string[] emailIds) returns error? {
-    email:Email msg = {
+    email:Message msg = {
         'from: "builder@abc.com",
         subject: "Error Alert ...",
         to: emailIds,
         body: ""
     };
-    email:Error? response = smtpClient -> send(msg);
+    email:Error? response = smtpClient -> sendEmailMessage(msg);
     if (response is error) {
         io:println("error while sending the email: ", response.message());
         return response;

@@ -2,10 +2,10 @@ import ballerina/email;
 import ballerina/test;
 
 @test:Config {}
-function testEmail() {
-    email:SmtpClient smtpClient = new ("smtp.email.com", "sender@email.com"
+function testEmail() returns @tainted error?{
+    email:SmtpClient smtpClient = check new ("smtp.email.com", "sender@email.com"
         , "pass123");
-    email:Email email = {
+    email:Message email = {
         to: ["receiver1@email.com", "receiver2@email.com"],
         cc: ["receiver3@email.com", "receiver4@email.com"],
         bcc: ["receiver5@email.com"],

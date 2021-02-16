@@ -15,7 +15,7 @@
 // under the License.
 
 import ballerina/http;
-import ballerina/runtime;
+import ballerina/lang.runtime as runtime;
 import ballerina/task;
 import ballerina/test;
 import ballerina/io;
@@ -23,14 +23,14 @@ import ballerina/io;
 const HTTP_MESSAGE = "Hello from http service";
 const TASK_MESSAGE = "Hello from task service";
 
-http:Client httpClient = new ("http://localhost:15001/HttpService");
+http:Client httpClient = check new ("http://localhost:15001/HttpService");
 listener http:Listener backEndListener = new (15001);
 listener http:Listener clientListener = new (15002);
 
 string http_payload = "";
 
-service PostToHttpService = service {
-    resource function onTrigger(string message) {
+service object {} PostToHttpService = service object {
+    remote function onTrigger(string message) {
         io:println("testing ..... task");
         http:Request request = new;
         request.setTextPayload(<@untainted string>message);
@@ -50,25 +50,16 @@ service PostToHttpService = service {
     }
 };
 
-@http:ServiceConfig {
-    basePath: "/"
-}
-service GetResultService on clientListener {
-    @http:ResourceConfig {
-        methods: ["GET"],
-        path: "/"
-    }
-    resource function getResult(http:Caller caller, http:Request request) {
+service / on clientListener {
+
+    resource function get .(http:Caller caller, http:Request request) {
         var result = caller->respond(http_payload);
     }
 }
 
-service HttpService on backEndListener {
-    @http:ResourceConfig {
-        methods: ["POST"],
-        path: "/"
-    }
-    resource function handlePost(http:Caller caller, http:Request request) {
+service /HttpService on backEndListener {
+
+    resource function post .(http:Caller caller, http:Request request) {
         http:Response response = new;
         var requestMessage = request.getTextPayload();
         if (requestMessage is error) {
@@ -91,9 +82,9 @@ service HttpService on backEndListener {
 }
 
 @test:Config {}
-function testTaskWithHttpClient() {
-    http:Client multipleAttachmentClientEndpoint = new ("http://localhost:15002");
-    task:Scheduler timerForHttpClient = new ({intervalInMillis: 1000, initialDelayInMillis: 1000});
+function testTaskWithHttpClient() returns error? {
+    http:Client multipleAttachmentClientEndpoint = check new ("http://localhost:15002");
+    task:Scheduler timerForHttpClient = check new ({intervalInMillis: 1000, initialDelayInMillis: 1000});
     var attachResult = timerForHttpClient.attach(PostToHttpService, TASK_MESSAGE);
     if (attachResult is task:SchedulerError) {
         panic attachResult;
@@ -103,7 +94,7 @@ function testTaskWithHttpClient() {
             panic startResult;
         }
     }
-    runtime:sleep(4000);
+    runtime:sleep(4);
     var response = multipleAttachmentClientEndpoint->get("/");
     checkpanic timerForHttpClient.stop();
     if (response is http:Response) {
