@@ -1,28 +1,22 @@
 import ballerina/io;
-import ballerina/log;
 import ballerina/websocket;
 
-@websocket:ServiceConfig {
-    subProtocols: ["xml", "json"],
-    idleTimeout: 120
+service /chat on new websocket:Listener(9090) {
+
+    resource function get .() returns websocket:Service {
+        // Accept the WebSocket upgrade by returning a `websocket:Service`.
+        return new ChatService();
+    }
 }
 
-service /basic/ws on new websocket:Listener(9090) {
-   resource isolated function get .()
-                     returns websocket:Service|websocket:UpgradeError {
-       return new WsService();
-   }
-}
-
-service class WsService {
+service class ChatService {
     *websocket:Service;
-    // This `remote function` is triggered when a new text message is received
-    // from a client.
-    remote function onTextMessage(websocket:Caller caller, string text) {
-        io:println("\ntext message: " + text);
-        var err = caller->writeTextMessage("You said: " + text);
-        if (err is websocket:Error) {
-            log:printError("Error occurred when sending text", 'error = err);
-        }
+
+    // This `remote function` is triggered when a new message is received
+    // from a client. It accepts `anydata` as the function argument. The received data 
+    // will be converted to the data type stated as the function argument.
+    remote function onMessage(websocket:Caller caller, string chatMessage) returns error? {
+        io:println(chatMessage);
+        check caller->writeMessage("Hello!, How are you?");
     }
 }

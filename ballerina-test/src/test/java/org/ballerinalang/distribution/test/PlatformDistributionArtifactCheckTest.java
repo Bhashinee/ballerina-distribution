@@ -30,10 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
-import static org.ballerinalang.distribution.utils.TestUtils.DISTRIBUTIONS_DIR;
-import static org.ballerinalang.distribution.utils.TestUtils.MAVEN_VERSION;
-import static org.ballerinalang.distribution.utils.TestUtils.SHORT_VERSION;
-import static org.ballerinalang.distribution.utils.TestUtils.TEST_DISTRIBUTION_PATH;
+import static org.ballerinalang.distribution.utils.TestUtils.*;
 
 /**
  * Check if necessary files exists to build in the platform specific distributions.
@@ -45,10 +42,10 @@ public class PlatformDistributionArtifactCheckTest {
     @DataProvider(name = "distribution-provider")
     public Object[][] distributionNameProvider() {
         return new Object[][]{
-                {"ballerina-" + MAVEN_VERSION},
-                {"ballerina-linux-" + MAVEN_VERSION},
-                {"ballerina-macos-" + MAVEN_VERSION},
-                {"ballerina-windows-" + MAVEN_VERSION}
+                {"ballerina-" + MAVEN_VERSION + "-" + CODE_NAME},
+                {"ballerina-" + MAVEN_VERSION + "-" + CODE_NAME + "-linux"},
+                {"ballerina-" + MAVEN_VERSION + "-" + CODE_NAME + "-macos"},
+                {"ballerina-" + MAVEN_VERSION + "-" + CODE_NAME + "-windows"}
         };
     }
 
@@ -98,78 +95,6 @@ public class PlatformDistributionArtifactCheckTest {
     }
 
     @Test(dataProvider = "distribution-provider")
-    public void awsLambdaAnnotationExistsTest(String distributionFileName) {
-        Path distributionsPath = TEST_DISTRIBUTION_PATH.resolve(distributionFileName).resolve("distributions");
-        String jballerinaFileName = TestUtils.findFileOrDirectory(distributionsPath, DIST_NAME);
-        Objects.requireNonNull(jballerinaFileName);
-
-        Path cachePath = distributionsPath
-                .resolve(jballerinaFileName)
-                .resolve("repo")
-                .resolve("cache")
-                .resolve("ballerinax")
-                .resolve("awslambda")
-                .resolve("0.0.0");
-
-        Path breLibPath = distributionsPath
-                .resolve(jballerinaFileName)
-                .resolve("bre")
-                .resolve("lib");
-
-        Path bbePath = distributionsPath
-                .resolve(jballerinaFileName)
-                .resolve("examples")
-                .resolve("aws-lambda-deployment");
-
-        Path docsPath = distributionsPath
-                .resolve(jballerinaFileName)
-                .resolve("docs")
-                .resolve("ballerinax")
-                .resolve("awslambda");
-
-        Assert.assertTrue(Files.exists(cachePath));
-        Assert.assertNotNull(TestUtils.findFileOrDirectory(breLibPath, "awslambda-extension-"));
-        Assert.assertTrue(Files.exists(bbePath));
-        Assert.assertTrue(Files.exists(docsPath));
-    }
-
-    @Test(dataProvider = "distribution-provider")
-    public void azFunctionsAnnotationExistsTest(String distributionFileName) {
-        Path distributionsPath = TEST_DISTRIBUTION_PATH.resolve(distributionFileName).resolve("distributions");
-        String jballerinaFileName = TestUtils.findFileOrDirectory(distributionsPath, DIST_NAME);
-        Objects.requireNonNull(jballerinaFileName);
-
-        Path birPath = distributionsPath
-                .resolve(jballerinaFileName)
-                .resolve("repo")
-                .resolve("cache")
-                .resolve("ballerinax")
-                .resolve("azure_functions")
-                .resolve("1.0.0");
-
-        Path breLibPath = distributionsPath
-                .resolve(jballerinaFileName)
-                .resolve("bre")
-                .resolve("lib");
-
-        Path bbePath = distributionsPath
-                .resolve(jballerinaFileName)
-                .resolve("examples")
-                .resolve("azure-functions-deployment");
-
-        Path docsPath = distributionsPath
-                .resolve(jballerinaFileName)
-                .resolve("docs")
-                .resolve("ballerinax")
-                .resolve("azure_functions");
-
-        Assert.assertTrue(Files.exists(birPath));
-        Assert.assertNotNull(TestUtils.findFileOrDirectory(breLibPath, "azurefunctions-extension-"));
-        Assert.assertTrue(Files.exists(bbePath));
-        Assert.assertTrue(Files.exists(docsPath));
-    }
-
-    @Test(dataProvider = "distribution-provider")
     public void c2cToolingExistsTest(String distributionFileName) {
         Path distributionsPath = TEST_DISTRIBUTION_PATH.resolve(distributionFileName).resolve("distributions");
         String jballerinaFileName = TestUtils.findFileOrDirectory(distributionsPath, DIST_NAME);
@@ -182,7 +107,7 @@ public class PlatformDistributionArtifactCheckTest {
                 .resolve("lang-server")
                 .resolve("lib");
 
-        Assert.assertNotNull(TestUtils.findFileOrDirectory(c2cToolingLibPath, "c2c-tooling-"));
+        Assert.assertNotNull(TestUtils.findFileOrDirectory(c2cToolingLibPath, "cloud-tooling-"));
     }
 
     @AfterClass

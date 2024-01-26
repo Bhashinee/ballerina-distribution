@@ -5,14 +5,14 @@ public client class MockHttpClient {
     public string url = "http://mockUrl";
 
      remote function get(@untainted string path, http:RequestMessage message = (),
-        http:TargetType targetType = http:Response) returns http:Response|http:ClientError {
+        http:TargetType targetType = http:Response) returns http:Response | anydata |http:ClientError {
             http:Response res = new;
             res.statusCode = 500;
             return res;
     }
 
      remote function post(@untainted string path, http:RequestMessage message = (),
-        http:TargetType targetType = http:Response) returns http:Response|http:PayloadType|http:ClientError {
+        http:TargetType targetType = http:Response) returns http:Response|anydata|http:ClientError {
             http:Response res = new;
             res.statusCode = 500;
             return res;
@@ -104,8 +104,9 @@ json postResponse1 = {
     orderId : "200"
 };
 
-
-@test:Config { dependsOn : [test_findOrder]}
+@test:Config {
+    dependsOn : [test_findOrder]
+}
 function test_addOrder() {
     http:Response mockPostResponse = new;
     mockPostResponse.setJsonPayload(<@untainted> postResponse1);

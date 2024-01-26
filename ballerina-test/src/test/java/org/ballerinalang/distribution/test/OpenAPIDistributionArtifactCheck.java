@@ -52,7 +52,7 @@ public class OpenAPIDistributionArtifactCheck {
                 .resolve("cache")
                 .resolve("ballerina")
                 .resolve("openapi")
-                .resolve("2.0.8")
+                .resolve("1.8.0")
                 .resolve("bir");
 
         Path jarPath = TEST_DISTRIBUTION_PATH
@@ -61,8 +61,8 @@ public class OpenAPIDistributionArtifactCheck {
                 .resolve("cache")
                 .resolve("ballerina")
                 .resolve("openapi")
-                .resolve("2.0.8")
-                .resolve("java11");
+                .resolve("1.8.0")
+                .resolve("java17");
 
         Path balaPath = TEST_DISTRIBUTION_PATH
                 .resolve(DIST_NAME)
@@ -70,25 +70,15 @@ public class OpenAPIDistributionArtifactCheck {
                 .resolve("bala")
                 .resolve("ballerina")
                 .resolve("openapi")
-                .resolve("2.0.8")
-                .resolve("any")
+                .resolve("1.8.0")
+                .resolve("java17")
                 .resolve("platform")
-                .resolve("any");
+                .resolve("java17");
 
         Path breLibPath = TEST_DISTRIBUTION_PATH
                 .resolve(DIST_NAME)
                 .resolve("bre")
                 .resolve("lib");
-
-        Path bbePath01 = TEST_DISTRIBUTION_PATH
-                .resolve(DIST_NAME)
-                .resolve("examples")
-                .resolve("openapi-to-ballerina");
-
-        Path bbePath02 = TEST_DISTRIBUTION_PATH
-                .resolve(DIST_NAME)
-                .resolve("examples")
-                .resolve("ballerina-to-openapi");
 
         Path docsPath = TEST_DISTRIBUTION_PATH
                 .resolve(DIST_NAME)
@@ -96,13 +86,20 @@ public class OpenAPIDistributionArtifactCheck {
                 .resolve("ballerina")
                 .resolve("openapi");
 
+        Path languageExtension = TEST_DISTRIBUTION_PATH
+                .resolve(DIST_NAME)
+                .resolve("lib")
+                .resolve("tools")
+                .resolve("lang-server")
+                .resolve("lib");
+
         Assert.assertTrue(Files.exists(birPath));
         Assert.assertTrue(Files.exists(balaPath));
-        Assert.assertTrue(Files.exists(jarPath.resolve("openapi.jar")));
+        Assert.assertTrue(Files.exists(jarPath.resolve("ballerina-openapi-1.8.0.jar")));
         Assert.assertNotNull(TestUtils.findFileOrDirectory(breLibPath, "openapi-cli-"));
         Assert.assertNotNull(TestUtils.findFileOrDirectory(breLibPath, "openapi-validator-"));
-        Assert.assertTrue(Files.exists(bbePath01));
-        Assert.assertTrue(Files.exists(bbePath02));
+        Assert.assertNotNull(TestUtils.findFileOrDirectory(breLibPath, "openapi-bal-service-"));
+        Assert.assertNotNull(TestUtils.findFileOrDirectory(languageExtension, "openapi-ls-"));
         Assert.assertTrue(Files.exists(docsPath));
     }
 

@@ -16,8 +16,14 @@
 
 import ballerina/http;
 
-service on new http:Listener(9191) {
-    resource function get sayHello(http:Caller caller, http:Request req) returns error? {
-            check caller->respond("Hello, World!");
+service / on new http:Listener(9191) {
+    final int x;
+
+    function init() {
+        self.x = 5;
+    }
+
+    resource function get sayHello() returns string {
+        return "Hello, World!";
     }
 }

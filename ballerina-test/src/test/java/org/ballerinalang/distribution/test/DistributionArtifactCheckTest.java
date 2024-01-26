@@ -45,24 +45,23 @@ public class DistributionArtifactCheckTest {
     }
 
     @Test()
-    public void dockerAnnotationExistsTest() {
+    public void c2cExistsTest() {
         Path cachePath = TEST_DISTRIBUTION_PATH
                 .resolve(DIST_NAME)
                 .resolve("repo")
                 .resolve("cache")
                 .resolve("ballerina")
-                .resolve("cloud")
-                .resolve("1.0.0");
+                .resolve("cloud");
 
-        Path breLibPath = TEST_DISTRIBUTION_PATH
-                .resolve(DIST_NAME)
-                .resolve("bre")
-                .resolve("lib");
-
-        Path bbePath = TEST_DISTRIBUTION_PATH
+        Path dockerBbePath = TEST_DISTRIBUTION_PATH
                 .resolve(DIST_NAME)
                 .resolve("examples")
-                .resolve("c2c-deployment");
+                .resolve("c2c-docker-deployment");
+
+        Path k8sBbePath = TEST_DISTRIBUTION_PATH
+                .resolve(DIST_NAME)
+                .resolve("examples")
+                .resolve("c2c-k8s-deployment");
 
         Path docsPath = TEST_DISTRIBUTION_PATH
                 .resolve(DIST_NAME)
@@ -71,72 +70,8 @@ public class DistributionArtifactCheckTest {
                 .resolve("cloud");
 
         Assert.assertTrue(Files.exists(cachePath));
-        Assert.assertNotNull(TestUtils.findFileOrDirectory(breLibPath, "c2c-extension-"));
-        Assert.assertTrue(Files.exists(bbePath));
-        Assert.assertTrue(Files.exists(docsPath));
-    }
-
-    @Test()
-    public void awsLambdaAnnotationExistsTest() {
-        Path cachePath = TEST_DISTRIBUTION_PATH
-                .resolve(DIST_NAME)
-                .resolve("repo")
-                .resolve("cache")
-                .resolve("ballerinax")
-                .resolve("awslambda")
-                .resolve("0.0.0");
-
-        Path breLibPath = TEST_DISTRIBUTION_PATH
-                .resolve(DIST_NAME)
-                .resolve("bre")
-                .resolve("lib");
-
-        Path bbePath = TEST_DISTRIBUTION_PATH
-                .resolve(DIST_NAME)
-                .resolve("examples")
-                .resolve("aws-lambda-deployment");
-
-        Path docsPath = TEST_DISTRIBUTION_PATH
-                .resolve(DIST_NAME)
-                .resolve("docs")
-                .resolve("ballerinax")
-                .resolve("awslambda");
-
-        Assert.assertTrue(Files.exists(cachePath));
-        Assert.assertNotNull(TestUtils.findFileOrDirectory(breLibPath, "awslambda-extension-"));
-        Assert.assertTrue(Files.exists(bbePath));
-        Assert.assertTrue(Files.exists(docsPath));
-    }
-
-    @Test()
-    public void azFunctionsAnnotationExistsTest() {
-        Path cachePath = TEST_DISTRIBUTION_PATH
-                .resolve(DIST_NAME)
-                .resolve("repo")
-                .resolve("cache")
-                .resolve("ballerinax")
-                .resolve("azure_functions")
-                .resolve("1.0.0");
-
-        Path breLibPath = TEST_DISTRIBUTION_PATH
-                .resolve(DIST_NAME)
-                .resolve("bre")
-                .resolve("lib");
-
-        Path bbePath = TEST_DISTRIBUTION_PATH
-                .resolve(DIST_NAME)
-                .resolve("examples")
-                .resolve("azure-functions-deployment");
-
-        Path docsPath = TEST_DISTRIBUTION_PATH
-                .resolve(DIST_NAME)
-                .resolve("docs")
-                .resolve("ballerinax")
-                .resolve("azure_functions");
-
-        Assert.assertTrue(Files.exists(cachePath));
-        Assert.assertNotNull(TestUtils.findFileOrDirectory(breLibPath, "azurefunctions-extension-"));
-        Assert.assertTrue(Files.exists(bbePath));
+        Assert.assertTrue(Files.exists(dockerBbePath));
+        Assert.assertTrue(Files.exists(k8sBbePath));
         Assert.assertTrue(Files.exists(docsPath));
     }
 
@@ -149,7 +84,7 @@ public class DistributionArtifactCheckTest {
                 .resolve("lang-server")
                 .resolve("lib");
 
-        Assert.assertNotNull(TestUtils.findFileOrDirectory(c2cToolingLibPath, "c2c-tooling-"));
+        Assert.assertNotNull(TestUtils.findFileOrDirectory(c2cToolingLibPath, "cloud-tooling-"));
     }
 
     @AfterClass

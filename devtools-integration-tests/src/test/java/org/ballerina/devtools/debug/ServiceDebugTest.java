@@ -23,15 +23,15 @@ import org.ballerinalang.debugger.test.utils.BallerinaTestDebugPoint;
 import org.ballerinalang.debugger.test.utils.DebugTestRunner;
 import org.ballerinalang.debugger.test.utils.DebugUtils;
 import org.ballerinalang.test.context.BallerinaTestException;
+import org.eclipse.lsp4j.debug.StackFrame;
 import org.eclipse.lsp4j.debug.StoppedEventArguments;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static org.ballerinalang.debugger.test.utils.DebugUtils.findFreePort;
 
 /**
  * Test class for service related debug scenarios.
@@ -47,31 +47,55 @@ public class ServiceDebugTest extends BaseTestCase {
         debugTestRunner = new DebugTestRunner(testProjectName, testModuleFileName, true);
     }
 
-    @Test(enabled = false, description = "Test for service module debug engage")
+    @Test(description = "Test for service module debug engage")
     public void testModuleServiceDebugScenarios() throws BallerinaTestException {
         String fileName = "hello_service.bal";
-        String filePath = Paths.get(debugTestRunner.testProjectPath, fileName).toString();
-        int port = findFreePort();
+        Path filePath = debugTestRunner.testProjectPath.resolve(fileName);
 
-        debugTestRunner.runDebuggeeProgram(debugTestRunner.testProjectPath, port);
-        debugTestRunner.addBreakPoint(new BallerinaTestDebugPoint(filePath, 22));
-        debugTestRunner.initDebugSession(DebugUtils.DebuggeeExecutionKind.BUILD, port);
+        debugTestRunner.addBreakPoint(new BallerinaTestDebugPoint(filePath, 23));
+        debugTestRunner.addBreakPoint(new BallerinaTestDebugPoint(filePath, 28));
+        debugTestRunner.initDebugSession(DebugUtils.DebuggeeExecutionKind.TEST);
 
-        // Test for service debug where service is in the default module
-        Pair<BallerinaTestDebugPoint, StoppedEventArguments> debugHitInfo = debugTestRunner.waitForDebugHit(20000);
+        // test for debug hits in service level variables
+        Pair<BallerinaTestDebugPoint, StoppedEventArguments> debugHitInfo = debugTestRunner.waitForDebugHit(30000);
         Assert.assertEquals(debugHitInfo.getLeft(), debugTestRunner.testBreakpoints.get(0));
+
+        // Timeout Exception is expected, since the service get started once the VM is resumed and resource
+        // function cannot have any debug hits until an HTTP request is received.
+        debugTestRunner.resumeProgram(debugHitInfo.getRight(), DebugTestRunner.DebugResumeKind.NEXT_BREAKPOINT);
+        try {
+            debugTestRunner.waitForDebugHit(10000);
+        } catch (BallerinaTestException e) {
+            if (!e.getMessage().equals("Timeout expired waiting for the debug hit")) {
+                throw e;
+            }
+        }
     }
 
-    @Test(enabled = false, description = "Test for single bal file debug engage")
+    @Test(description = "Test for service call stack representation")
+    public void serviceCallStackDebugTest() throws BallerinaTestException {
+        String fileName = "hello_service.bal";
+        Path filePath = debugTestRunner.testProjectPath.resolve(fileName);
+
+        debugTestRunner.addBreakPoint(new BallerinaTestDebugPoint(filePath, 23));
+        debugTestRunner.initDebugSession(DebugUtils.DebuggeeExecutionKind.TEST);
+
+        // Test for service call stack representation
+        Pair<BallerinaTestDebugPoint, StoppedEventArguments> debugHitInfo = debugTestRunner.waitForDebugHit(30000);
+        StackFrame[] frames = debugTestRunner.fetchStackFrames(debugHitInfo.getRight());
+        debugTestRunner.assertCallStack(frames[0], "init", 23, "hello_service.bal");
+    }
+
+    @Test(description = "Test for single bal file debug engage")
     public void testSingleBalFileServiceDebugScenarios() throws BallerinaTestException {
         String testProjectName = "";
         String testSingleFileName = "hello_service.bal";
         debugTestRunner = new DebugTestRunner(testProjectName, testSingleFileName, false);
 
-        debugTestRunner.addBreakPoint(new BallerinaTestDebugPoint(debugTestRunner.testEntryFilePath, 23));
+        debugTestRunner.addBreakPoint(new BallerinaTestDebugPoint(debugTestRunner.testEntryFilePath, 24));
         debugTestRunner.initDebugSession(DebugUtils.DebuggeeExecutionKind.TEST);
 
-        Pair<BallerinaTestDebugPoint, StoppedEventArguments> debugHitInfo = debugTestRunner.waitForDebugHit(20000);
+        Pair<BallerinaTestDebugPoint, StoppedEventArguments> debugHitInfo = debugTestRunner.waitForDebugHit(30000);
         Assert.assertEquals(debugHitInfo.getLeft(), debugTestRunner.testBreakpoints.get(0));
     }
 

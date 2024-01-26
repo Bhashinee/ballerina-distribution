@@ -1,20 +1,23 @@
 import ballerina/test;
 import ballerina/http;
+import ballerina/lang.runtime;
 
 @test:Config {}
-function testFunc() {
-    http:Client httpEndpoint = checkpanic new("http://localhost:9090");
-
-    // Send a GET request to the specified endpoint
-    var response = httpEndpoint->get("/timeout");
-    if (response is http:Response) {
-        var result = response.getTextPayload();
-        if (result is string) {
-            test:assertEquals(result, "Request timed out. Please try again in sometime.");
-        } else {
-            test:assertFail(msg = "Invalid response message");
-        }
+function testFunc() returns error? {
+    http:Client backendClientEP = check new ("localhost:8080", {
+        timeout: 10
+    });
+    string|error response = backendClientEP->get("/greeting");
+    if response is error {
+        test:assertEquals(response.message(), "Idle timeout triggered before initiating inbound response");
     } else {
-        test:assertFail(msg = "Failed to call the endpoint");
+        test:assertFail("Unexpected response");
+    }
+}
+
+service / on new http:Listener(8080) {
+    resource function get greeting() returns string {
+        runtime:sleep(15);
+        return "Hello World!!!";
     }
 }

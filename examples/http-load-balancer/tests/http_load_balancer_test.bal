@@ -1,60 +1,40 @@
 import ballerina/test;
 import ballerina/http;
 
-@test:Config {
+@test:Config {}
+function testFunc() returns error? {
+    http:LoadBalanceClient httpEndpoint = check new ({
+        targets: [
+            {url: "http://localhost:8080/mock1"},
+            {url: "http://localhost:8080/mock2"},
+            {url: "http://localhost:8080/mock3"}
+        ],
+        timeout: 5
+    });
+
+    string response = check httpEndpoint->/greeting;
+    test:assertEquals(response, "Mock1 resource was invoked.");
+
+    response = check httpEndpoint->/greeting;
+    test:assertEquals(response, "Mock2 resource was invoked.");
+
+    response = check httpEndpoint->/greeting;
+    test:assertEquals(response, "Mock3 resource was invoked.");
+
+    response = check httpEndpoint->/greeting;
+    test:assertEquals(response, "Mock1 resource was invoked.");
 }
-function testFunc() {
-    // Invoking the main function
-    http:Client httpEndpoint = checkpanic new("http://localhost:9090");
 
-    // Send a GET request to the specified endpoint
-    var response1 = httpEndpoint->get("/lb");
-    if (response1 is http:Response) {
-        var result = response1.getTextPayload();
-        if (result is string) {
-            test:assertEquals(result, "Mock1 resource was invoked.");
-        } else {
-            test:assertFail(msg = "Invalid response message:");
-        }
-    } else {
-        test:assertFail(msg = "Failed to call the endpoint:");
+service / on new http:Listener(8080) {
+    resource function get mock1/greeting() returns string {
+        return "Mock1 resource was invoked.";
     }
 
-    var response2 = httpEndpoint->get("/lb");
-    if (response2 is http:Response) {
-        var result = response2.getTextPayload();
-        if (result is string) {
-            test:assertEquals(result, "Mock2 resource was invoked.");
-        } else {
-            test:assertFail(msg = "Invalid response message:");
-        }
-    } else {
-        test:assertFail(msg = "Failed to call the endpoint:");
+    resource function get mock2/greeting() returns string {
+        return "Mock2 resource was invoked.";
     }
 
-    // Send a GET request to the specified endpoint
-    var response3 = httpEndpoint->get("/lb");
-    if (response3 is http:Response) {
-        var result = response3.getTextPayload();
-        if (result is string) {
-            test:assertEquals(result, "Mock3 resource was invoked.");
-        } else {
-            test:assertFail(msg = "Invalid response message:");
-        }
-    } else {
-        test:assertFail(msg = "Failed to call the endpoint:");
-    }
-
-    // Send a GET request to the specified endpoint
-    var response4 = httpEndpoint->get("/lb");
-    if (response4 is http:Response) {
-        var result = response4.getTextPayload();
-        if (result is string) {
-            test:assertEquals(result, "Mock1 resource was invoked.");
-        } else {
-            test:assertFail(msg = "Invalid response message:");
-        }
-    } else {
-        test:assertFail(msg = "Failed to call the endpoint:");
+    resource function get mock3/greeting() returns string {
+        return "Mock3 resource was invoked.";
     }
 }

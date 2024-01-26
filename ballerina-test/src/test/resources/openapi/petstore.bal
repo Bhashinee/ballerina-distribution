@@ -4,13 +4,13 @@ import ballerina/log;
 listener http:Listener helloEp = new (9090);
 
 service /hello on helloEp {
-    resource function get hi(http:Caller caller, http:Request request) {
+    resource function get hi(http:Caller caller) {
         http:Response res = new;
         res.setPayload("Hello World!");
 
         var result = caller->respond(res);
         if (result is error) {
-           log:printError("Error when responding", err = result);
+           log:printError("Error when responding", err = result.toString());
         }
     }
 }

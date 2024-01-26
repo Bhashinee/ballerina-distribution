@@ -1,4 +1,5 @@
 # Ballerina Distribution
+
 [![Ballerina Distribution Build](https://github.com/ballerina-platform/ballerina-distribution/workflows/Ballerina%20Distribution%20Build/badge.svg)](https://github.com/ballerina-platform/ballerina-distribution/actions?query=workflow%3A%22Ballerina+Distribution+Build%22)
 [![Daily build](https://github.com/ballerina-platform/ballerina-distribution/workflows/Daily%20build/badge.svg)](https://github.com/ballerina-platform/ballerina-distribution/actions?query=workflow%3A%22Daily+build%22)
 
@@ -32,7 +33,7 @@ Alternatively, you can install Ballerina from the source using the following ins
 
 #### Prerequisites
 
-* JDK11 ([Adopt OpenJDK11](https://adoptopenjdk.net/) or any other OpenJDK distribution)
+* JDK17 ([Adopt OpenJDK17](https://adoptopenjdk.net/) or any other OpenJDK distribution)
 
 #### Building the source
 
@@ -54,9 +55,23 @@ Alternatively, you can install Ballerina from the source using the following ins
     set packageUser=<Your github username>
     set packagePAT=<Your personal access token>
     ```
- 
-3. Run the Gradle build command ``./gradlew build`` from the repository root directory.
-4. Extract the Ballerina distribution created at `ballerina/target/ballerina-<version>-SNAPSHOT.zip`.
+3. This repository contains central integration tests. You need to have dev access token of the bctestorg organization to run these tests. Then you need to set following environment variables. 
+
+   Linux/Unix
+    ```bash
+    export BALLERINA_DEV_CENTRAL=true
+    export BALLERINA_CENTRAL_ACCESS_TOKEN=<Dev access token>
+    ```
+
+   Windows
+    ```batch
+    set BALLERINA_DEV_CENTRAL=true
+    set BALLERINA_CENTRAL_ACCESS_TOKEN=<Dev access token>
+    ```
+   Else you can disable central integration tests and build the repository.
+   
+4. Run the Gradle build command ``./gradlew build`` from the repository root directory.
+5. Out of the ZIP distributions in the `ballerina/build/distributions/` directory, extract the `ballerina-<version>-SNAPSHOT.zip` file (e.g., `ballerina-swan-lake-beta3-SNAPSHOT.zip`). The other distributions are used for installer generation.
 
 ## Contributing to Ballerina
 
@@ -71,5 +86,5 @@ Ballerina code is distributed under [Apache license 2.0](https://github.com/ball
 ## Useful links
 
 * The ballerina-dev@googlegroups.com mailing list is for discussing code changes to the Ballerina project.
-* Chat live with us on our [Slack channel](https://ballerina-platform.slack.com/).
+* Chat live with us via our [Discord server](https://discord.gg/ballerinalang).
 * Technical questions should be posted on Stack Overflow with the [#ballerina](https://stackoverflow.com/questions/tagged/ballerina) tag.

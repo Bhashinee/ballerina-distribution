@@ -1,76 +1,48 @@
 import ballerina/io;
 
-// Defines an object type called `Person`. It should only contain fields and the
-// method declarations.
+type Cloneable object {
+    function clone() returns Cloneable;
+};
+
 type Person object {
-    public int age;
-    public string firstName;
-    public string lastName;
+    // The `Cloneable` object type is included as a part of the interface of
+    // the `Person` object type.
+    *Cloneable;
 
-    // Method declarations can be within the object. However, the method cannot
-    // have a body.
-    function getFullName() returns string;
+    string name;
+
+    // `getName()` is a part of the `Person`'s own type.
+    // The `clone()` function is also included from the `Cloneable` type.
+    function getName() returns string;
 };
 
-// Defines another object type called `Employee`, which "includes" the `Person` object.
-type Employee object {
-    // Add an object type (`Person`) inclusion.
-    // All the member fields and member-method declarations will be copied from the `Person` object.
+class Engineer {
+    // The `Engineer` class includes the `Person` object type.
+    // Therefore, it has to implement both the `clone()` and `getName()` methods.
     *Person;
-    public float|string salary;
 
-    function getSalary() returns float|string;
-};
-
-class Owner {
-    public string status = "";
-}
-
-class Manager {
-    // Inclusing the `Employee` object transitively includes the `Person` object as well.
-    // This will copy all the members in both `Employee` and `Person`.
-    // It will be the same as declaring each of those members within this object.
-    *Employee;
-
-    // It is possible to have more than one type inclusion as well.
-    *Owner;
-
-    public string dpt;
-
-    // Included fields can be overridden in a type-descriptor if the type of the field
-    // in the overriding descriptor is a sub-type of the original type of the field.
-    public float salary;
-
-    // All the fields included through a type inclusion can be accessed within this object.
-    function init(int age, string firstName, string lastName, string status) {
-        self.age = age;
-        self.firstName = firstName;
-        self.lastName = lastName;
-        self.status = status;
-        self.salary = 2000.0;
-        self.dpt = "HR";
+    function init(string name) {
+        // The `name` field is included from the `Person` type.
+        self.name = name;
     }
 
-    // The member methods coming from the included type should be defined within the object.
-    function getFullName() returns string {
-        return self.firstName + " " + self.lastName;
+    // Returning `Engineer` is valid as the `Engineer` type becomes a subtype of the `Cloneable` type
+    // once it includes the `Cloneable` object type.
+    function clone() returns Engineer {
+        return new (self.name);
     }
 
-    // Included methods can also be overridden as long as the method in the overriding
-    // descriptor is a sub-type of the method in the included type.
-    function getSalary() returns float {
-        return self.salary;
+    function getName() returns string {
+        return self.name;
     }
 }
 
 public function main() {
-    Manager p = new Manager(5, "John", "Doe", "Senior");
+    Engineer engineer = new Engineer("Alice");
+    io:println(engineer.getName());
 
-    // Accessing the fields that are coming from the included type.
-    io:println(p.age);
-    io:println(p.dpt);
+    Engineer engineerClone = engineer.clone();
+    io:println(engineerClone.getName());
 
-    // Invoking the methods that are coming from the included type.
-    io:println(p.getFullName());
-    io:println(p.getSalary());
+    io:println(engineer === engineerClone);
 }

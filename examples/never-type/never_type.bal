@@ -1,32 +1,41 @@
-type Person record {
-    string name;
-    int age;
+import ballerina/io;
+
+type Pair record {
+    int x;
+    int y;
 };
 
-type Student record {
-    string name;
-    // An optional field can be of type `never`, but a value can never be assigned to such a field.
-    never gender?;
+Pair p = {
+    x: 1,
+    y: 2,
+    "color": "blue"
 };
 
-// This function never returns. So we have `never` as the return type.
-function somefunction() returns never {
-    panic error("Invalid");
+// This is a record with two `x` and `y` optional fields of the `never` type.
+// However, as you cannot have values of the `never` type,
+// the net result is that you cannot have the `x` and `y`fields in the record.
+type PairRest record { 
+    never x?; 
+    never y?; 
+};
+
+// The function always panics. It never returns normally.
+// Therefore, the return type can be defined as `never`.
+function whoops() returns never {
+    panic error("whoops");
 }
 
 public function main() {
-    // This is an example of using `never` as the type parameter in `xml`.
-    // `xml<never>` describes the `xml` type that has no constituents,
-    // i.e., the empty `xml` value.
-    xml<never> xmlValue = <xml<never>> 'xml:concat();
+    // `xml<never>` describes the XML type that has no constituents.
+    // Therefore `x` is an empty XML sequence.
+    xml<never> x = xml ``;
+    io:println(x);
 
-    // You can define a mapping value with `never` as its constraint.
-    // But you can never add members to this map.
-    map<never> someMap = {};
-
-    // You can specify a key-less table with the `never` type as the key constraint.
-    table<Person> key<never> personTable = table [
-        {name: "John", age: 23},
-        {name: "Paul", age: 25}
-    ];
+    // The `rest` variable contains the fields in `p` other than `x` and `y`.
+    var {x: _, y: _, ...rest} = p;
+    // Type of `rest` is a subtype of `PairRest`.
+    PairRest pairRest = rest;
+    io:println(pairRest);
+    // Call the function that always panics.
+    whoops();
 }

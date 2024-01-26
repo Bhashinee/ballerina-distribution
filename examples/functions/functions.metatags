@@ -1,2 +1,2 @@
-description: A function in Ballerina is a mechanism to create a reusable unit of functionality within a program.
-keywords: ballerina, ballerina by example, bbe, functions
+description: This BBE demonstrates creating functions with defaultable parameters and passing named arguments to the function in Ballerina.
+keywords: ballerina, ballerina by example, bbe, functions, function defintion, parameters, default parameters, returns

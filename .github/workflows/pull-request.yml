@@ -6,48 +6,74 @@ on:
             - master
             - ballerina-1.1.x
             - ballerina-1.2.x
+            - 2201.[0-9]+.x
 
 jobs:
     ubuntu-integration-tests:
+        name: Integration Tests on Ubuntu
         runs-on: ubuntu-latest
+        concurrency:
+            group: ${{ github.ref }}-integration-tests
+            cancel-in-progress: true
         steps:
-            -   name: Checkout
-                uses: actions/checkout@v2
-            -   name: Set up JDK 11
-                uses: actions/setup-java@v1
+            -   name: Checkout Repository
+                uses: actions/checkout@v3
+            -   name: Set up JDK 17
+                uses: actions/setup-java@v3
                 with:
-                    java-version: 11
+                    distribution: 'temurin'
+                    java-version: '17.0.7'
             -   name: Build Ballerina Distribution
                 env:
                     packageUser: ${{ github.actor }}
                     packagePAT: ${{ secrets.GITHUB_TOKEN }}
-                run: ./gradlew clean build --stacktrace --scan --console=plain --no-daemon --continue -x :ballerina:testExamples
+                    devCentralToken: ${{ secrets.BALLERINA_CENTRAL_DEV_ACCESS_TOKEN }}
+                    githubAccessToken: ${{ secrets.GITHUB_TOKEN }}
+                    ballerinaBotWorkflow: $ {{ secrets.BALLERINA_BOT_WORKFLOW }}
+                run: ./gradlew clean build --stacktrace --scan --console=plain --no-daemon --continue -x :ballerina:testExamples -x :project-api-tests:test
 
     ubuntu-bbe-tests:
+        name: BBE Tests on Ubuntu
         runs-on: ubuntu-latest
+        concurrency:
+            group: ${{ github.ref }}-bbe-tests
+            cancel-in-progress: true
         steps:
-            -   name: Checkout
-                uses: actions/checkout@v2
-            -   name: Set up JDK 11
-                uses: actions/setup-java@v1
+            -   name: Checkout Repository
+                uses: actions/checkout@v3
+            -   name: Set up JDK 17
+                uses: actions/setup-java@v3
                 with:
-                    java-version: 11
+                    distribution: 'temurin'
+                    java-version: '17.0.7'
             -   name: Build Ballerina Distribution
                 env:
                     packageUser: ${{ github.actor }}
                     packagePAT: ${{ secrets.GITHUB_TOKEN }}
-                run: ./gradlew clean :ballerina:testExamples --stacktrace --scan --console=plain --no-daemon --continue
+                    devCentralToken: ${{ secrets.BALLERINA_CENTRAL_DEV_ACCESS_TOKEN }}
+                    githubAccessToken: ${{ secrets.GITHUB_TOKEN }}
+                    ballerinaBotWorkflow: $ {{ secrets.BALLERINA_BOT_WORKFLOW }}
+                run: ./gradlew clean :ballerina:testExamples --stacktrace --scan --console=plain --no-daemon --continue -x :project-api-tests:test
     windows-build-without-tests:
+        name: Windows Build
         runs-on: windows-latest
+        concurrency:
+            group: ${{ github.ref }}-windows
+            cancel-in-progress: true
         steps:
-            - name: Checkout
-              uses: actions/checkout@v2
-            - name: Set up JDK 11
-              uses: actions/setup-java@v1
-              with:
-                  java-version: 11
+            -   name: Checkout Repository
+                uses: actions/checkout@v3
+            -   name: Set up JDK 17
+                uses: actions/setup-java@v3
+                with:
+                    distribution: 'temurin'
+                    java-version: '17.0.7'
             - name: Build Ballerina Distribution
               env:
                   packageUser: ${{ github.actor }}
                   packagePAT: ${{ secrets.GITHUB_TOKEN }}
+                  JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8
+                  devCentralToken: ${{ secrets.BALLERINA_CENTRAL_DEV_ACCESS_TOKEN }}
+                  githubAccessToken: ${{ secrets.GITHUB_TOKEN }}
+                  ballerinaBotWorkflow: $ {{ secrets.BALLERINA_BOT_WORKFLOW }}
               run: ./gradlew.bat clean build --stacktrace --scan --console=plain --no-daemon --continue -x test

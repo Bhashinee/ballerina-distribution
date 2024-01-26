@@ -1,36 +1,35 @@
 import ballerina/io;
 
-// This function takes a `string` argument. However, it does not return a value.
-function printValue(string value) {
-    io:println(value);
+// This function definition has two parameters of type `int`.
+// The `returns` clause specifies the type of the return value.
+function add(int x, int y) returns int {
+    int sum = x + y;
+    // The `return` statement returns a value.
+    return sum;
 }
 
-// This function takes in two `int` values as arguments and returns their
-// sum as an integer.
-function add(int a, int b) returns int {
-    return a + b;
+// The function parameters can have default values.
+function calculateWeight(decimal mass, decimal gForce = 9.8) returns decimal {
+    return mass * gForce;
 }
 
-function printAndReturnValue(string s) returns string {
-    string t = "Hello ".concat(s);
-    io:println(t);
-    return t;
+// The function returns `nil`.
+function print(anydata data) {
+    io:println(data);
 }
 
-// A public function named `main` is considered as a default entry point of a
-// Ballerina program.
 public function main() {
-    // Call the `printValue()` function that prints the value provided.
-    printValue("This is a sample text");
+    // Invoke the function `add` by passing the arguments.
+    int sum = add(5, 11);
+    // A function with no return type does not need a variable assignment.
+    print(sum);
 
-    // Call the `add()` function to retrieve the result of adding two given values.
-    int result = add(5, 6);
-    // Print the result.
-    io:println(result);
+    // Invoke the `calculateWeight` function with the default arguments.
+    print(calculateWeight(5));
 
-    // Ballerina does not allow ignoring the return value of a function
-    // invocation implicitly unless the return type is `()`. A return value can be ignored
-    // using `_` if the value may never be an `error` (i.e., the return type of the
-    // function does not contain `error`).
-    _ = printAndReturnValue("World");
+    // Invoke the `add` function with the named arguments.
+    print(add(x = 5, y = 6));
+
+    // The return value of the function can be ignored by assigning it to `_`.
+    _ = calculateWeight(mass = 5, gForce = 10);
 }

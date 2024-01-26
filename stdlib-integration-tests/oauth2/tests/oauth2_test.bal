@@ -15,7 +15,6 @@
 // under the License.
 
 import ballerina/http;
-import ballerina/regex;
 import ballerina/test;
 
 listener http:Listener oauth2Listener = new(25003, {
@@ -68,7 +67,7 @@ public function testOAuth2Module() {
             token: ACCESS_TOKEN
         }
     });
-    var response = clientEP->get("/foo/bar");
+    http:Response|http:ClientError response = clientEP->get("/foo/bar");
     if (response is http:Response) {
         assertOK(response);
     } else {
@@ -93,10 +92,10 @@ service /oauth2 on authorizationServer {
     resource function post token/introspect(http:Request request) returns json {
         string|http:ClientError payload = request.getTextPayload();
         if (payload is string) {
-            string[] parts = regex:split(payload, "&");
+            string[] parts = re `&`.split(payload);
             foreach string part in parts {
                 if (part.indexOf("token=") is int) {
-                    string token = regex:split(part, "=")[1];
+                    string token = re `=`.split(part)[1];
                     if (token == ACCESS_TOKEN) {
                         json response = { "active": true, "exp": 3600, "scp": "read write" };
                         return response;

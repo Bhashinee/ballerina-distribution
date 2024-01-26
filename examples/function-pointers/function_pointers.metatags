@@ -1,2 +1,2 @@
-description: A function pointer is a Ballerina type that allows you to use functions as variables, arguments to functions, and function return values.
-keywords: ballerina, ballerina by example, bbe, function pointers
+description: This BBE demonstrates using function pointers in function parameters, passing the default value to the parameters of the function pointers, and creating a function in Ballerina.
+keywords:  ballerina, ballerina by example, bbe, function definition, function pointers, defaultable parameters
